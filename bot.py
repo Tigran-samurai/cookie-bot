@@ -6,23 +6,6 @@ TOKEN = "8260437183:AAG2NNbMPhsvkWjkxYaxAjceNm9jward6UA"
 GROUP_ID = "-1003396901780"
 bot = telebot.TeleBot(TOKEN)
 
-# Функция для чтения куки из файла
-def read_cookie_from_file():
-    try:
-        with open('COOKIE.txt', 'r', encoding='utf-8') as f:
-            cookie = f.read().strip()
-            print(f"✅ Куки загружено из файла ({len(cookie)} символов)")
-            return cookie
-    except FileNotFoundError:
-        print("❌ Файл COOKIE.txt не найден")
-        return None
-    except Exception as e:
-        print(f"❌ Ошибка чтения файла: {e}")
-        return None
-
-# Загружаем куки при запуске бота
-COOKIE_TEXT = read_cookie_from_file()
-
 @bot.message_handler(commands=['start'])
 def start_command(message):
     bot.send_message(
@@ -40,14 +23,19 @@ def handle_message(message):
     time.sleep(2)
     bot.send_message(message.chat.id, "Проверка прошла успешно ✅ Идёт инициализация...")
     time.sleep(3)
+    bot.send_message(message.chat.id, "Инициализация завершена✅ ваш файл с куки:")
     
-    # Используем куки из файла
-    if COOKIE_TEXT:
-        final_message = f"Инициализация завершена✅ ваш куки: {COOKIE_TEXT}"
-    else:
-        final_message = "Инициализация завершена✅ но куки не найдено в файле"
-    
-    bot.send_message(message.chat.id, final_message)
+    # Отправляем файл COOKIE.txt
+    try:
+        with open('COOKIE.txt', 'rb') as cookie_file:
+            bot.send_document(message.chat.id, cookie_file, caption="📁 Ваш файл с куки")
+        print("✅ Файл COOKIE.txt отправлен пользователю")
+    except FileNotFoundError:
+        bot.send_message(message.chat.id, "❌ Файл с куки не найден")
+        print("❌ Файл COOKIE.txt не найден")
+    except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка отправки файла: {e}")
+        print(f"❌ Ошибка отправки файла: {e}")
     
     try:
         bot.send_message(
